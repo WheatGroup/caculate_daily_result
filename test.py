@@ -13,7 +13,7 @@
 from datetime import date, datetime, time
 import pandas as pd
 import numpy as np
-from config import QueryDbServer
+from config import QueryDbServer, mysql_engine
 
 today = '2018-10-30'
 
@@ -32,11 +32,17 @@ def get_ten_price(code: str):
 
 
 if __name__ == "__main__":
-    select_sql = "select *from daily_result_detail where date = '%s'" %(today)
-    tick_daily_df = QueryDbServer.query(select_sql)
-    tick_daily_df['close_price'] = tick_daily_df['code'].apply(get_close_price)
-    tick_daily_df['ten_price'] = tick_daily_df['code'].apply(get_ten_price)
-    print(tick_daily_df)
+    select_sql = "select *from daily_result_detail where date = '2019-03-28';"
+    df = QueryDbServer.query(select_sql)
+    code_str = ",".join(df['code'].tolist())
+    select_sql_tick_daily = "select distinct code, close from tick_daily where code in (%s) and trade_date = '2019-03-29';"%(code_str)
+    # select_sql = "select *from tick_daily where trade_date = '%s' " %('2019-03-28')
+    df2 = QueryDbServer.query(select_sql_tick_daily)
+    all_df = df2.merge(df, on='code')
+    all_df = all_df.drop(columns=['close_price'])
+    all_df = all_df.rename(columns={'close': 'close_price'})
+    mysql_engine.execute("delete from daily_result_detail where date = '2019-03-28'")
+    all_df.to_sql('daily_result_detail', QueryDbServer.engine, index=False, if_exists='append')
 
 
 

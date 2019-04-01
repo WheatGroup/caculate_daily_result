@@ -55,14 +55,11 @@ ExecuDbServer = WR_SQL(host, user, password, db, 'mysql_execute', port=3306)
 HOSTNAME = '123.57.81.203'
 PORT     = '3306'
 DATABASE = 'limit_up'
-USERNAME = 'gggin'
+USERNAME = 'root'
 PASSWORD = '123456'
 DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8'.format(USERNAME, PASSWORD, HOSTNAME, PORT, DATABASE)
-SQLALCHEMY_DATABASE_URI = DB_URI
 
 
 mysql_engine = create_engine(DB_URI)
-DB_Session = sessionmaker(bind=mysql_engine)
-session = DB_Session()
 
 

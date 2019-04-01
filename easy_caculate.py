@@ -11,7 +11,7 @@
 from datetime import date, datetime, time
 import pandas as pd
 import numpy as np
-from config import QueryDbServer, session
+from config import QueryDbServer, mysql_engine
 import tushare as ts
 
 
@@ -21,6 +21,8 @@ result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
 df2 = result[(result.calendarDate >= '2017-12-01') & (result.calendarDate <= '2018-01-01') & (result.isOpen == 1)] .iloc[-1:].append(df)
 trading_day_df = df2.reset_index(drop=True)[['calendarDate']]
+table_name = date.today().strftime('%Y-%m-%d')
+
 
 
 def is_in(code: str, code_list: list):
@@ -37,10 +39,10 @@ def get_pro_trading_day(TradingDay: str):
 
 
 def caculate_limitup_time(code: str):
-    print(code)
-    selectsql = "select *from tick_daily where code = '%s' and trade_date = '%s' order by trade_time;"%( code, today)
+    selectsql = "select *from %s where code = '%s' and trade_date = '%s' order by trade_time;"%(table_name, code, today)
     code_df = QueryDbServer.query(selectsql)
     code_df['limit_up'] = round(code_df['close'] * 1.1, 2)
+    limit_up_time = ''
     for index, rows in code_df.iterrows():
         if rows['now'] == rows['limit_up']:
             limit_up_time = rows['trade_time']
@@ -49,21 +51,21 @@ def caculate_limitup_time(code: str):
 
 
 def get_close_price(code: str):
-    selectsql = "select close from tick_daily where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\
-    %(code, today)
+    selectsql = "select now from %s where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\
+    %(table_name, code, today)
     close_df = QueryDbServer.query(selectsql)
-    return close_df['close'][0]
+    return close_df['now'][0]
 
 def get_open_price(code: str):
-    selectsql = "select open from tick_daily where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\
-    %(code, today)
+    selectsql = "select open from %s where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\
+    %(table_name, code, today)
     open_df = QueryDbServer.query(selectsql)
     return open_df['open'][0]
 
 
 def get_ten_price(code: str):
-    selectsql = "select now from tick_daily where code = '%s' and trade_date = '%s' and trade_time > '09:59:59' order by trade_time limit 1;"\
-    %(code, today)
+    selectsql = "select now from %s where code = '%s' and trade_date = '%s' and trade_time > '09:59:59' order by trade_time limit 1;"\
+    %(table_name, code, today)
     ten_df = QueryDbServer.query(selectsql)
     return ten_df['now'][0]
 
@@ -77,25 +79,24 @@ def get_num_raiselimit(code:str):
         return int(ten_df['num_raiselimit'][0]) + 1
 
 
-
 if __name__ == "__main__":
     ### 每天预先创建当前的表
-    session.execute("CREATE TABLE `2019-03-31` (`code` varchar(255) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+    # mysql_engine.execute("DROP TABLE IF EXISTS `2019-03-18`;")
 
     # 需要先去
     #  date symbol ten_is_raiselimit ten_is_one close_is_raiselimit raisenum_one symbol
     # 先取出当天的所有交易时间点
-    time_sql = "SELECT DISTINCT query_time from tick_daily  where trade_date = '%s' ;" % (today)
+    time_sql = "SELECT DISTINCT query_time from %s  where trade_date = '%s' ;" % (table_name, today)
     query_time_df = QueryDbServer.query(time_sql)
     ten_query_time = query_time_df[(query_time_df.query_time > "10:00:00")&(query_time_df.query_time < "10:01:00")]['query_time'].tolist()[-1]
     # 再者需要确认的是 是否一个query 对应的trade_time是同一个
     #  代码空缺
     #
     ten_query_time = str(ten_query_time)[-8:]
-    selectsql = "select *from tick_daily where query_time = '%s' and name not like '%%%%%s%%%%' and \
-    name not like '%%%%%s%%%%' and trade_date = '%s';" %(ten_query_time, 'st', 'ST', today)
+    selectsql = "select *from %s where query_time = '%s' and name not like '%%%%%s%%%%' and \
+    name not like '%%%%%s%%%%' and trade_date = '%s';" %(table_name, ten_query_time, 'st', 'ST', today)
     ten_code_df = QueryDbServer.query(selectsql)
-    ten_code_df['limit_up'] = round(ten_code_df['close'] * 1.1, 2)
+    ten_code_df['limit_up'] = round(ten_code_df['yst_close'] * 1.1, 2)
     # 除去代码中带有st的股票
     ten_is_raiselimit_df = ten_code_df[ten_code_df.limit_up == ten_code_df.bid1]
     # print(ten_is_raiselimit_df)
@@ -111,8 +112,8 @@ if __name__ == "__main__":
     #  代码空缺
     #
     close_query_time = str(close_query_time)[-8:]
-    selectsql = "select *from tick_daily where query_time = '%s' and name not like '%%%%%s%%%%' and \
-        name not like '%%%%%s%%%%' and trade_date = '%s';" % (close_query_time, 'st', 'ST', today)
+    selectsql = "select *from %s where query_time = '%s' and name not like '%%%%%s%%%%' and \
+        name not like '%%%%%s%%%%' and trade_date = '%s';" % (table_name, close_query_time, 'st', 'ST', today)
     close_code_df = QueryDbServer.query(selectsql)
     close_code_df['limit_up'] = round(close_code_df['close'] * 1.1, 2)
     # 除去代码中带有st的股票
