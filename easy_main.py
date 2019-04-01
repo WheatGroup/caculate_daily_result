@@ -47,7 +47,7 @@ if __name__ == "__main__":
       KEY `date_time` (`trade_date`,`trade_time`) USING BTREE\
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_mysql500_ci;"
     create_table_sql = sql %(table_name)
-    mysql_engine.execute(create_table_sql)
+#mysql_engine.execute(create_table_sql)
     # 定时抓取 每日市场信息
     '''
     stock_basic = pro.query('stock_basic', exchange_id='', list_status='L', fields='ts_code,symbol,name,area,industry,list_date')
@@ -69,8 +69,6 @@ if __name__ == "__main__":
             df = pd.DataFrame(data).T
             df = df[['date', 'time', 'close', 'open', 'high', 'low', 'now', 'name', 'bid1','volume', 'turnover']]
             df = df[df['name'].str.contains('^((?!ST).)*$')]
-            df['chg'] = (df['now'] - df['close'])/df['close']
-            df['chg'] = df['chg'].apply(lambda x: "%.4f" % x)
             df['query_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             df.reset_index(inplace=True)
             df.rename(columns={'index':'code', 'date':'trade_date', 'time':'trade_time', 'close':'yst_close'}, inplace=True)
