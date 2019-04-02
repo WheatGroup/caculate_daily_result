@@ -69,7 +69,7 @@ if __name__ == "__main__":
             df = pd.DataFrame(data).T
             df = df[['date', 'time', 'close', 'open', 'high', 'low', 'now', 'name', 'bid1','volume', 'turnover']]
             df = df[df['name'].str.contains('^((?!ST).)*$')]
-            df['query_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            df['query_time'] = datetime.now().strftime('%H:%M:%S')
             df.reset_index(inplace=True)
             df.rename(columns={'index':'code', 'date':'trade_date', 'time':'trade_time', 'close':'yst_close'}, inplace=True)
             df.to_sql(table_name, con=QueryDbServer.engine, index=False, if_exists='append')
