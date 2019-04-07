@@ -150,7 +150,7 @@ if __name__ == "__main__":
     limit_up_df.to_sql('daily_result_detail', QueryDbServer.engine, index=False, if_exists='append')
     #只保留9:25~9:35 和 9:55~10:05 和 14:55~15:05,节省空间，提高后续程序查表时间
     sqldelete = "delete from `%s` where (query_time < '09:25:00') or (query_time > '09:35:00' and query_time < '09:55:00') or (query_time > '10:05:00' and query_time < '14:55:00');" %(table_name)
-    QueryDbServer.query(sqldelete)
+    mysql_engine.execute(sqldelete)
     save_element()
 
 
