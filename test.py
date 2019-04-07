@@ -15,7 +15,6 @@ import pandas as pd
 import numpy as np
 from config import QueryDbServer, mysql_engine
 
-today = '2018-10-30'
 
 def get_close_price(code: str):
     selectsql = "select now from tick_daily where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\

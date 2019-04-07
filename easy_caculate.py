@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 from config import QueryDbServer, mysql_engine
 import tushare as ts
+from tools import save_element
 
 
 today = date.today().strftime('%Y-%m-%d')
@@ -147,5 +148,6 @@ if __name__ == "__main__":
     limit_up_df['num_raiselimit'] = limit_up_df['code'].apply(get_num_raiselimit)
 
     limit_up_df.to_sql('daily_result_detail', QueryDbServer.engine, index=False, if_exists='append')
+    save_element()
 
 
