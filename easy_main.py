@@ -64,7 +64,7 @@ if __name__ == "__main__":
     quotation = easyquotation.use("sina")
     while(True):
         time_now = datetime.now().time()
-        if(time_now > time(9, 10) and time_now < time(11, 30)) or (time_now > time(13, 0) and time_now > time(15, 10)):
+        if(time_now > time(9, 10) and time_now < time(11, 30)) or (time_now > time(13, 0) and time_now < time(15, 10)):
             data = quotation.stocks(stock_list)
             df = pd.DataFrame(data).T
             df = df[['date', 'time', 'close', 'open', 'high', 'low', 'now', 'name', 'bid1','volume', 'turnover']]
