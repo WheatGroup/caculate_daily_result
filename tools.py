@@ -354,8 +354,11 @@ def get_today_code_info(day, code):
     num_raiselimit = tmp['num_raiselimit'].values[0]
     return {'code':code, 'name':code_name, 'time':time_raiselimit, 'frequency':str(num_raiselimit)}
 
-
-
+def get_today_code(TradingDay: str):
+    select_sql = "select ts_code from stock_basic where trade_date = '%s';" % TradingDay
+    code_df = QueryDbServer.query(select_sql)
+    code_list = code_df['ts_code'].tolist()
+    return code_list
 # if __name__ == '__main__':
 #     day = '2019-04-04'
 #     code = '603885'
