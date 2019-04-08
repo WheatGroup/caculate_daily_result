@@ -14,7 +14,6 @@ from config import mysql_engine
 
 
 from datetime import datetime, date, timedelta
-from decorator import timeit
 
 import tushare as ts
 import time, traceback
