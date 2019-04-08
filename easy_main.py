@@ -65,7 +65,7 @@ if __name__ == "__main__":
     while(True):
         sleep(30)
         time_now = datetime.now().time()
-        if (time_now > time(9, 25) and time_now < time(9, 35)) or (time_now > time(9, 55) and time_now < time(10, 05)) or (time_now > time(14, 55) and time_now < time(15, 05)) :
+        if (time_now > time(9, 25) and time_now < time(11, 30)) or (time_now > time(13, 00)) and (time_now < time(15,5)):
             data = quotation.stocks(stock_list)
             df = pd.DataFrame(data).T
             df = df[['date', 'time', 'close', 'open', 'high', 'low', 'now', 'name', 'bid1','volume', 'turnover']]
