@@ -10,7 +10,7 @@
 import pandas as pd
 import numpy as np
 
-from config import mysql_engine
+from config import mysql_engine, QueryDbServer
 
 
 from datetime import datetime, date, timedelta
