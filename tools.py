@@ -189,14 +189,15 @@ def get_elements():
 
 def save_element():
     element_list = get_elements()
-    sql_inset_daily_28 = "insert into daily_28(date, element1, element2, element3, element4, element5, element6, element7, element8, element9, element10, element11, element12, element13, element14, \
+    sql_inset_daily_28 = "insert into daily_28(trade_date, element1, element2, element3, element4, element5, element6, element7, element8, element9, element10, element11, element12, element13, element14, \
                         element15, element16, element17, element18, element19, element20, element21, element22, element23, element24, element25, element26, element27, element28) VALUES( \
                         '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');" \
             %(element_list[0], element_list[1], element_list[2], element_list[3],element_list[4], element_list[5], element_list[6], element_list[7],\
               element_list[8], element_list[9], element_list[10], element_list[11],element_list[12], element_list[13], element_list[14], element_list[15], \
               element_list[16], element_list[17], element_list[18], element_list[19], element_list[20], element_list[21], element_list[22], element_list[23], \
               element_list[24], element_list[25], element_list[26], element_list[27], element_list[28]);
-    pd.read_sql(sql_inset_daily_28, mysql_engine)
+    mysql_engine.execute(sql_inset_daily_28)
+    # pd.read_sql(sql_inset_daily_28, mysql_engine)
 
 def get_last_trading_day(year, month):
     # tm = pd.Timestamp(year=i.year, month=i.month, day=i.day)
