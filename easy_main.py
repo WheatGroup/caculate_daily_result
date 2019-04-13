@@ -63,8 +63,9 @@ if __name__ == "__main__":
         stock_list = data['symbol'].tolist()
     quotation = easyquotation.use("sina")
     while(True):
+        sleep(30)
         time_now = datetime.now().time()
-        if(time_now > time(9, 10) and time_now < time(11, 30)) or (time_now > time(13, 0) and time_now < time(15, 10)):
+        if (time_now > time(9, 25) and time_now < time(11, 30)) or (time_now > time(13, 00)) and (time_now < time(15,5)):
             data = quotation.stocks(stock_list)
             df = pd.DataFrame(data).T
             df = df[['date', 'time', 'close', 'open', 'high', 'low', 'now', 'name', 'bid1','volume', 'turnover']]
@@ -75,7 +76,6 @@ if __name__ == "__main__":
             df.to_sql(table_name, con=QueryDbServer.engine, index=False, if_exists='append')
             # df.to_excel('tick_daily.xlsx', index=False, if_exists='append')
             print("数据入库完毕")
-            sleep(30)
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(now)
 
