@@ -39,11 +39,13 @@ def get_4(day):
     return num_df['num'][0]
 
 def get_5(day):
-    #十点前上板的非一字涨停板,不包括 st
-    sql = "select count(*) as num from daily_result_detail where date = '%s' and ten_is_one = 0 and ten_is_raiselimit = 1;" % day
-    num_df = pd.read_sql(sql, mysql_engine)
-    print(num_df['num'][0])
-    return num_df['num'][0]
+    return get_ten_info(day, 0)
+
+    # #十点前上板的非一字涨停板,不包括 st
+    # sql = "select count(*) as num from daily_result_detail where date = '%s' and ten_is_one = 0 and ten_is_raiselimit = 1;" % day
+    # num_df = pd.read_sql(sql, mysql_engine)
+    # print(num_df['num'][0])
+    # return num_df['num'][0]
 
 def get_6(day):
     #手动填写文字
@@ -111,7 +113,8 @@ def get_26(day):
 
 def get_27(day):
     pre_today = get_pro_trading_day(day)
-    fenmu = get_5(pre_today)
+    fenmu = get_ten_info(pre_today, 1)
+    #获取昨天10点之前涨停股票信息
     pre_limit_up_info = get_limit_up_detail(1, pre_today, 0)
 
     fenzi = 0
@@ -126,10 +129,11 @@ def get_27(day):
 def get_28(day):
     #成功率=昨日10:00涨停的收盘价格上涨/昨日10:00之前非一字板的数量
     pre_today = get_pro_trading_day(day)
-    fenmu = get_5(pre_today)
+    fenmu = get_ten_info(pre_today, 1)
     pre_limit_up_info = get_limit_up_detail(1, pre_today, 2)
     fenzi = 0
     for i, row in pre_limit_up_info.iterrows():
+        print(i)
         if is_shangzhang(1, row, day):
             fenzi = fenzi + 1
     success_rate = round(fenzi/fenmu, 2)
@@ -138,21 +142,16 @@ def get_28(day):
 
 def get_elements():
     elements_list = []
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     today = datetime.now().strftime('%Y-%m-%d')
-    # today = '2019-04-04'
+    # today = '2019-04-11'
     pre_today = get_pro_trading_day(today)
     element1 = datetime.now().strftime('%m/%d')
     element2 = datetime.now().strftime('%m') + "月" + datetime.now().strftime('%d') + "日"
 
     elements_list.extend([today, element1, element2])
-    month = str(datetime.now().timetuple().tm_mon)
-    day = str(datetime.now().timetuple().tm_mday)
-    day = datetime.now().strftime('%Y-%m-%d')
-    # day = '2019-04-04'
 
-    open_shangzhang_num, close_shangzhang_num = shangzhang_rate(day)
-    #
+    open_shangzhang_num, close_shangzhang_num = shangzhang_rate(today)
+
     element_3 = get_3(today)
     element_4 = get_4(today)
     element_5 = get_5(today)
@@ -241,6 +240,18 @@ def is_shangzhang(is_ten, code_info, day):
         else:
             return False
 
+def get_ten_info(day, is_one):
+    if 0 == is_one:
+        # 十点前上板的非一字涨停板,不包括 st
+        sql = "select count(*) as num from daily_result_detail where date = '%s' and ten_is_one = 0 and ten_is_raiselimit = 1;" % day
+    else:
+        #十点前上板的涨停，一字板+非一字板
+        sql = "select count(*) as num from daily_result_detail where date = '%s' and ten_is_raiselimit = 1;" % day
+
+    num_df = pd.read_sql(sql, mysql_engine)
+    print(num_df['num'][0])
+    return num_df['num'][0]
+
 def is_gaokai(row, day):
     return is_gaokai_sucess(0, row, day)
 
@@ -277,14 +288,19 @@ def get_code_info(is_ten, code, day):
     if 0 == is_ten:
         #15：00之后的now 就是收盘价了
         sql = "select * from `%s` where code = '%s' and query_time > '15:00:00' limit 1;" %(day, code)
-    else:
+    elif 1 == is_ten:
+        #10：00的价格
         sql = "select * from `%s` where code = '%s' and query_time > '09:59:59' limit 1;" %(day, code)
+    else:
+        #9：29开盘价
+        sql = "select * from `%s` where code = '%s' and query_time > '09:29:59' limit 1;" %(day, code)
     tmp = pd.read_sql(sql, mysql_engine)
     return tmp
 
 def shangzhang_rate(day):
-    #一字开盘,(-&, -2%),[-2%,0),[0,2%),[2%,5%),[5%,+$) 左闭右开的个数
+    #昨日涨停今日开盘,一字开盘、(-&, -2%),[-2%,0),[0,2%),[2%,5%),[5%,+$) 左闭右开的个数
     rate1_num = []
+    #昨日涨停今日收盘,[连板/上涨5%+/0~5%/下跌/停盘]
     rate2_num = []
     rate0 = rate1 = rate2 = rate3 = rate4 = rate5 = 0
     rate6 = rate7 = rate8 = rate9 = rate10 = 0
@@ -294,11 +310,13 @@ def shangzhang_rate(day):
     for i, row in limit_up_info.iterrows():
         # if row['code'] == '600156':
         this_code_today_info = get_code_info(0, row['code'], day)
-        rate1_tmp_series = (this_code_today_info['open']-row['close_price'])/row['close_price']
         try:
-            print(i)
-            rate1_tmp = rate1_tmp_series[0]
-            if (this_code_today_info['bid1'][0] == this_code_today_info['now'][0]):
+            #开盘价的表现
+            rate1_tmp_series = (this_code_today_info['open'].values[0] - row['close_price']) / row['close_price']
+            rate1_tmp = rate1_tmp_series
+            print(i, '===', rate1_tmp, "====", row['code'], "====", this_code_today_info['open'].values[0], "====", row['close_price'])
+            # if (this_code_today_info['bid1'][0] == this_code_today_info['now'][0]):
+            if (this_code_today_info['bid1'][0] == this_code_today_info['open'][0]):
                 #一字开盘
                 rate0 = rate0+1
             elif(rate1_tmp < -0.02):
@@ -311,6 +329,7 @@ def shangzhang_rate(day):
                 rate4 = rate4+1
             else:
                 rate5 = rate5+1
+            #收盘价的表现
             rate2_tmp_series = (this_code_today_info['now'] - row['close_price']) / row['close_price']
             rate2_tmp = rate2_tmp_series[0]
             if (0 == this_code_today_info['turnover'][0]):
@@ -359,9 +378,10 @@ def get_today_code(TradingDay: str):
     code_df = QueryDbServer.query(select_sql)
     code_list = code_df['ts_code'].tolist()
     return code_list
-# if __name__ == '__main__':
-#     day = '2019-04-04'
-#     code = '603885'
-#     dict = get_today_code_info(day, code)
-#     # get_28(day)
-#     get_elements()
+
+if __name__ == '__main__':
+    # day = '2019-04-12'
+    # code = '603885'
+    # dict = get_today_code_info(day, code)
+    # get_28(day)
+    get_elements()
