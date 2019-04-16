@@ -24,7 +24,7 @@ table_name = today
 
 def is_limit_up(now, yst_close):
     limit_up = round(yst_close * 1.1, 2)
-    now = round(now * 1.1, 2)
+    now = round(now, 2)
     if now == limit_up:
         return 1
     else:
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     quotation = easyquotation.use("sina")
     limit_up_codes = set()
     while(True):
-        # sleep(30)
+        sleep(30)
         time_now = datetime.now().time()
         #
         if (time_now > time(9, 25) and time_now < time(11, 30)) or (time_now > time(13, 00) and time_now < time(15,5)):
@@ -94,6 +94,6 @@ if __name__ == "__main__":
             break
     ###  将全天记录的结果存入到文件中
     codes_str = ",".join(list(limit_up_codes))
-    fh = open('limit_up_code.txt', 'w', encoding='utf-8')
+    fh = open('/home/ray/workspace/python/limit_up/caculate_daily_result/limit_up_code.txt', 'w', encoding='utf-8')
     fh.write(codes_str)
     fh.close()

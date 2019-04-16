@@ -17,7 +17,6 @@ from tools import save_element
 
 
 today = date.today().strftime('%Y-%m-%d')
-today = '2019-04-11'
 table_name =  today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
@@ -82,7 +81,7 @@ def get_num_raiselimit(code:str):
 
 if __name__ == "__main__":
     ### 读取当天所有的涨停过的股票
-    fh = open('limit_up_code.txt', 'r', encoding='utf-8')
+    fh = open('/home/ray/workspace/python/limit_up/caculate_daily_result/limit_up_code.txt', 'r', encoding='utf-8')
     codes_str = fh.read()
     fh.close()
     symbol = codes_str.split(',')
