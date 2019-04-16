@@ -85,6 +85,7 @@ if __name__ == "__main__":
     codes_str = fh.read()
     fh.close()
     symbol = codes_str.split(',')
+    print(symbol)
     ### 每天预先创建当前的表
     # mysql_engine.execute("DROP TABLE IF EXISTS `2019-03-18`;")
 
