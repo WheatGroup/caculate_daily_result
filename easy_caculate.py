@@ -84,6 +84,7 @@ if __name__ == "__main__":
     fh = open('/home/ray/workspace/python/limit_up/caculate_daily_result/limit_up_code.txt', 'r', encoding='utf-8')
     codes_str = fh.read()
     fh.close()
+    codes_str = codes_str.replace('\n', '')
     symbol = codes_str.split(',')
     print(symbol)
     ### 每天预先创建当前的表
