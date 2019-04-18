@@ -89,5 +89,3 @@ if __name__ == "__main__":
             print("数据入库完毕")
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(now)
-    ###  将全天记录的结果存入到文件中
-
