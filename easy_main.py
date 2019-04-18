@@ -90,10 +90,3 @@ if __name__ == "__main__":
             print("数据入库完毕")
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(now)
-        else:
-            break
-    ###  将全天记录的结果存入到文件中
-    codes_str = ",".join(list(limit_up_codes))
-    fh = open('/home/ray/workspace/python/limit_up/caculate_daily_result/limit_up_code.txt', 'w', encoding='utf-8')
-    fh.write(codes_str)
-    fh.close()
