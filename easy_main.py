@@ -54,7 +54,7 @@ if __name__ == "__main__":
       KEY `date_time` (`trade_date`,`trade_time`) USING BTREE\
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_mysql500_ci;"
     create_table_sql = sql %(table_name)
-#mysql_engine.execute(create_table_sql)
+    #mysql_engine.execute(create_table_sql)
     # 定时抓取 每日市场信息
     '''
     stock_basic = pro.query('stock_basic', exchange_id='', list_status='L', fields='ts_code,symbol,name,area,industry,list_date')
@@ -73,7 +73,6 @@ if __name__ == "__main__":
     while(True):
         sleep(30)
         time_now = datetime.now().time()
-        #
         if (time_now > time(9, 25) and time_now < time(11, 30)) or (time_now > time(13, 00) and time_now < time(15,5)):
             data = quotation.stocks(stock_list)
             df = pd.DataFrame(data).T
@@ -90,10 +89,5 @@ if __name__ == "__main__":
             print("数据入库完毕")
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(now)
-        else:
-            break
     ###  将全天记录的结果存入到文件中
-    codes_str = ",".join(list(limit_up_codes))
-    fh = open('/home/ray/workspace/python/limit_up/caculate_daily_result/limit_up_code.txt', 'w', encoding='utf-8')
-    fh.write(codes_str)
-    fh.close()
+
