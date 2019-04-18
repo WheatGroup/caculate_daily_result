@@ -17,7 +17,8 @@ from tools import save_element
 
 
 today = date.today().strftime('%Y-%m-%d')
-table_name =  today
+today = '2019-04-18'
+table_name = today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
 df2 = result[(result.calendarDate >= '2017-12-01') & (result.calendarDate <= '2018-01-01') & (result.isOpen == 1)] .iloc[-1:].append(df)
@@ -30,6 +31,7 @@ def is_in(code: str, code_list: list):
         return True
     else:
         return False
+
 
 def get_pro_trading_day(TradingDay: str):
     index = trading_day_df[trading_day_df.calendarDate==TradingDay].index
@@ -81,12 +83,9 @@ def get_num_raiselimit(code:str):
 
 if __name__ == "__main__":
     ### 读取当天所有的涨停过的股票
-    fh = open('/home/ray/workspace/python/limit_up/caculate_daily_result/limit_up_code.txt', 'r', encoding='utf-8')
-    codes_str = fh.read()
-    fh.close()
-    codes_str = codes_str.replace('\n', '')
-    symbol = codes_str.split(',')
-    print(symbol)
+    sql = "SELECT DISTINCT(code) from `%s` where is_limit_up = 1;" % (table_name)
+    code_df = QueryDbServer.query(sql)
+    symbol = code_df['code'].tolist()
     ### 每天预先创建当前的表
     # mysql_engine.execute("DROP TABLE IF EXISTS `2019-03-18`;")
 
