@@ -56,14 +56,6 @@ if __name__ == "__main__":
     create_table_sql = sql %(table_name)
     #mysql_engine.execute(create_table_sql)
     # 定时抓取 每日市场信息
-    '''
-    stock_basic = pro.query('stock_basic', exchange_id='', list_status='L', fields='ts_code,symbol,name,area,industry,list_date')
-    if stock_basic.empty:
-    raise ValueError('stock_basic 数据是空的')
-        stock_basic['trade_date'] = today
-    stock_basic = stock_basic.reset_index(drop=True)
-        stock_basic.to_sql('stock_basic', con=QueryDbServer.engine, index=False, if_exists='append')
-    '''
     stock_list = get_today_code(today)
     if len(stock_list) == 0:
         data = pro.query('stock_basic', exchange_id='', list_status='L', fields='symbol')
