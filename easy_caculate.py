@@ -17,13 +17,12 @@ from tools import save_element
 
 
 today = date.today().strftime('%Y-%m-%d')
-# today = '2019-01-04'
+# today = '2019-04-18'
+table_name = today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
 df2 = result[(result.calendarDate >= '2017-12-01') & (result.calendarDate <= '2018-01-01') & (result.isOpen == 1)] .iloc[-1:].append(df)
 trading_day_df = df2.reset_index(drop=True)[['calendarDate']]
-table_name = date.today().strftime('%Y-%m-%d')
-
 
 
 def is_in(code: str, code_list: list):
@@ -31,6 +30,7 @@ def is_in(code: str, code_list: list):
         return True
     else:
         return False
+
 
 def get_pro_trading_day(TradingDay: str):
     index = trading_day_df[trading_day_df.calendarDate==TradingDay].index
@@ -57,6 +57,7 @@ def get_close_price(code: str):
     close_df = QueryDbServer.query(selectsql)
     return close_df['now'][0]
 
+
 def get_open_price(code: str):
     selectsql = "select open from `%s` where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\
     %(table_name, code, today)
@@ -70,6 +71,7 @@ def get_ten_price(code: str):
     ten_df = QueryDbServer.query(selectsql)
     return ten_df['now'][0]
 
+
 def get_num_raiselimit(code:str):
     pre_day = get_pro_trading_day(today)
     sql = "select num_raiselimit from daily_result_detail where code = '%s' and date = '%s' and close_is_raiselimit = 1;" %(code, pre_day)
@@ -81,6 +83,10 @@ def get_num_raiselimit(code:str):
 
 
 if __name__ == "__main__":
+    ### 读取当天所有的涨停过的股票
+    sql = "SELECT DISTINCT(code) from `%s` where is_limit_up = 1;" % (table_name)
+    code_df = QueryDbServer.query(sql)
+    symbol = code_df['code'].tolist()
     ### 每天预先创建当前的表
     # mysql_engine.execute("DROP TABLE IF EXISTS `2019-03-18`;")
 
@@ -124,7 +130,8 @@ if __name__ == "__main__":
     close_is_one_df = close_code_df[(close_code_df.high == close_code_df.low) & (close_code_df.open == close_code_df.high) & (
     close_code_df.open == close_code_df.limit_up)]
     # print(close_is_one_df)
-    symbol = list(set(ten_is_raiselimit_df['code'].tolist() + close_is_raiselimit_df['code'].tolist()))
+
+
     limit_up_df = pd.DataFrame(columns=['date', 'code', 'ten_is_raiselimit', 'ten_is_one', 'close_is_raiselimit', \
                           'close_is_one', 'time_raiselimit', 'num_raiselimit'])
     limit_up_df['code'] = symbol

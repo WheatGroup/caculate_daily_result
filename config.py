@@ -46,7 +46,7 @@ class WR_SQL:
 host = '123.57.81.203'
 db = 'limit_up'
 user = 'root'
-password = '123456'
+password = '123wheatforever321'
 
 
 QueryDbServer = WR_SQL(host, user, password, db, 'mysql_pd', port=3306)
@@ -56,7 +56,7 @@ HOSTNAME = '123.57.81.203'
 PORT     = '3306'
 DATABASE = 'limit_up'
 USERNAME = 'root'
-PASSWORD = '123456'
+PASSWORD = '123wheatforever321'
 DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8'.format(USERNAME, PASSWORD, HOSTNAME, PORT, DATABASE)
 
 
