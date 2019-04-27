@@ -17,13 +17,12 @@ from tools import save_element
 
 
 today = date.today().strftime('%Y-%m-%d')
-today = '2019-04-18'
+# today = '2019-04-18'
 table_name = today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
 df2 = result[(result.calendarDate >= '2017-12-01') & (result.calendarDate <= '2018-01-01') & (result.isOpen == 1)] .iloc[-1:].append(df)
 trading_day_df = df2.reset_index(drop=True)[['calendarDate']]
-
 
 
 def is_in(code: str, code_list: list):
@@ -58,6 +57,7 @@ def get_close_price(code: str):
     close_df = QueryDbServer.query(selectsql)
     return close_df['now'][0]
 
+
 def get_open_price(code: str):
     selectsql = "select open from `%s` where code = '%s' and trade_date = '%s' and trade_time > '14:59:59' order by trade_time limit 1;"\
     %(table_name, code, today)
@@ -70,6 +70,7 @@ def get_ten_price(code: str):
     %(table_name, code, today)
     ten_df = QueryDbServer.query(selectsql)
     return ten_df['now'][0]
+
 
 def get_num_raiselimit(code:str):
     pre_day = get_pro_trading_day(today)

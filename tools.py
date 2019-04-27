@@ -86,6 +86,7 @@ def get_11(day):
             fenzi = fenzi+1
             print(fenzi)
     gaokai_chance = round(fenzi/fenmu, 2)
+    gaokai_chance = str(gaokai_chance * 100) + '%'
     return gaokai_chance
 
 def get_18(day):
@@ -103,6 +104,7 @@ def get_19(day):
             fenzi = fenzi + 1
 
     success_rate = round(fenzi/fenmu, 2)
+    success_rate = str(success_rate * 100) + '%'
     return success_rate
 
 def get_25(day):
@@ -124,6 +126,7 @@ def get_27(day):
             fenzi = fenzi + 1
 
     gaokai_chance = round(fenzi/fenmu, 2)
+    gaokai_chance = str(gaokai_chance * 100) + '%'
     return gaokai_chance
 
 def get_28(day):
@@ -137,6 +140,7 @@ def get_28(day):
         if is_shangzhang(1, row, day):
             fenzi = fenzi + 1
     success_rate = round(fenzi/fenmu, 2)
+    success_rate = str(success_rate*100) + '%'
     return success_rate
 
 
