@@ -33,7 +33,7 @@ def get_3(day):
 
 def get_4(day):
     #当天的非一字板，不包括 st
-    sql = "select count(*) as num from daily_result_detail where date = '%s' and close_is_one = 0;" % day
+    sql = "select count(*) as num from daily_result_detail where date = '%s' and close_is_one = 0 and close_is_raiselimit = 1;" % day
     num_df = pd.read_sql(sql, mysql_engine)
     print(num_df['num'][0])
     return num_df['num'][0]
@@ -147,7 +147,7 @@ def get_28(day):
 def get_elements():
     elements_list = []
     today = datetime.now().strftime('%Y-%m-%d')
-    # today = '2019-04-11'
+    # today = '2019-04-26'
     pre_today = get_pro_trading_day(today)
     element1 = datetime.now().strftime('%m/%d')
     element2 = datetime.now().strftime('%m') + "月" + datetime.now().strftime('%d') + "日"

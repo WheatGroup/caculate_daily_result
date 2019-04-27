@@ -81,7 +81,6 @@ def get_num_raiselimit(code:str):
     else:
         return int(ten_df['num_raiselimit'][0]) + 1
 
-
 if __name__ == "__main__":
     ### 读取当天所有的涨停过的股票
     sql = "SELECT DISTINCT(code) from `%s` where is_limit_up = 1;" % (table_name)
