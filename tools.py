@@ -33,7 +33,7 @@ def get_3(day):
 
 def get_4(day):
     #当天的非一字板，不包括 st
-    sql = "select count(*) as num from daily_result_detail where date = '%s' and close_is_one = 0;" % day
+    sql = "select count(*) as num from daily_result_detail where date = '%s' and close_is_one = 0 and close_is_raiselimit = 1;" % day
     num_df = pd.read_sql(sql, mysql_engine)
     print(num_df['num'][0])
     return num_df['num'][0]
@@ -147,7 +147,7 @@ def get_28(day):
 def get_elements():
     elements_list = []
     today = datetime.now().strftime('%Y-%m-%d')
-    # today = '2019-04-11'
+    # today = '2019-04-26'
     pre_today = get_pro_trading_day(today)
     element1 = datetime.now().strftime('%m/%d')
     element2 = datetime.now().strftime('%m') + "月" + datetime.now().strftime('%d') + "日"
@@ -383,8 +383,26 @@ def get_today_code(TradingDay: str):
     code_list = code_df['ts_code'].tolist()
     return code_list
 
+def save_become_worse():
+    day = datetime.now().strftime('%Y-%m-%d')
+    # day = '2019-04-26'
+    #从 result表中获取闭盘价不是涨停的股票信息
+    sql = "select * from daily_result_detail where date = '%s' and close_is_raiselimit = 0;" %(day)
+    tmp = pd.read_sql(sql, mysql_engine)
+
+    for i, row in tmp.iterrows():
+        this_code_today_info = get_code_info(0, row['code'], day)
+        tmp_code = row['code']
+        tmp_name = this_code_today_info['name'][0]
+        tmp_chg = (row['close_price'] - this_code_today_info['yst_close'].values[0])/this_code_today_info['yst_close'].values[0]
+        print(i, "====", tmp_code, '======', tmp_name, '=====', tmp_chg, "====", row['time_raiselimit'])
+        sql_inset_become_worse = "insert into become_worse(trade_date, code_name, chg, first_limitup) VALUES('%s', '%s', '%s', '%s');" \
+                             %(day, tmp_name, tmp_chg, row['time_raiselimit']);
+        mysql_engine.execute(sql_inset_become_worse)
+
 if __name__ == '__main__':
-    # day = '2019-04-12'
+
+    save_become_worse()
     # code = '603885'
     # dict = get_today_code_info(day, code)
     # get_28(day)

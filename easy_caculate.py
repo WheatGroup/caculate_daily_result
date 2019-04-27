@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 from config import QueryDbServer, mysql_engine
 import tushare as ts
-from tools import save_element
+from tools import save_element, save_become_worse
 
 
 today = date.today().strftime('%Y-%m-%d')
@@ -80,7 +80,6 @@ def get_num_raiselimit(code:str):
         return 1
     else:
         return int(ten_df['num_raiselimit'][0]) + 1
-
 
 if __name__ == "__main__":
     ### 读取当天所有的涨停过的股票
@@ -155,6 +154,8 @@ if __name__ == "__main__":
     limit_up_df['num_raiselimit'] = limit_up_df['code'].apply(get_num_raiselimit)
 
     limit_up_df.to_sql('daily_result_detail', QueryDbServer.engine, index=False, if_exists='append')
+    #该接口放在删除数据之前计算出来,并保存数据库
+    save_become_worse()
     #只保留9:25~9:35 和 9:55~10:05 和 14:55~15:05,节省空间，提高后续程序查表时间
     sqldelete = "delete from `%s` where (query_time < '09:25:00') or (query_time > '09:35:00' and query_time < '09:55:00') or (query_time > '10:05:00' and query_time < '14:55:00');" %(table_name)
     mysql_engine.execute(sqldelete)
