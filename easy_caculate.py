@@ -72,14 +72,16 @@ def get_ten_price(code: str):
     return ten_df['now'][0]
 
 
-def get_num_raiselimit(code:str):
+def get_num_raiselimit(code: str):
     pre_day = get_pro_trading_day(today)
+    # pre_day = '2019-04-30'
     sql = "select num_raiselimit from daily_result_detail where code = '%s' and date = '%s' and close_is_raiselimit = 1;" %(code, pre_day)
     ten_df = QueryDbServer.query(sql)
     if ten_df.empty:
         return 1
     else:
         return int(ten_df['num_raiselimit'][0]) + 1
+
 
 if __name__ == "__main__":
     ### 读取当天所有的涨停过的股票
@@ -100,7 +102,7 @@ if __name__ == "__main__":
     #
     ten_query_time = str(ten_query_time)[-8:]
     selectsql = "select *from `%s` where query_time = '%s' and name not like '%%%%%s%%%%' and \
-    name not like '%%%%%s%%%%' and trade_date = '%s';" %(table_name, ten_query_time, 'st', 'ST', today)
+    name not like '%%%%%s%%%%' and trade_date = '%s';" % (table_name, ten_query_time, 'st', 'ST', today)
     ten_code_df = QueryDbServer.query(selectsql)
     ten_code_df['limit_up'] = round(ten_code_df['yst_close'] * 1.1, 2)
     # 除去代码中带有st的股票
