@@ -17,7 +17,7 @@ from tools import save_element, save_become_worse
 
 
 today = date.today().strftime('%Y-%m-%d')
-# today = '2019-04-18'
+# today = '2019-05-15'
 table_name = today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
@@ -35,7 +35,6 @@ def is_in(code: str, code_list: list):
 def get_pro_trading_day(TradingDay: str):
     index = trading_day_df[trading_day_df.calendarDate==TradingDay].index
     pro_trading_day = trading_day_df.iloc[index-1]['calendarDate'].iloc[0]
-    print(pro_trading_day)
     return pro_trading_day
 
 

@@ -16,6 +16,7 @@ from config import *
 from datetime import datetime, date, time
 from irm_logger import Logger
 import pandas as pd
+from multiprocessing import Pool
 logger = Logger(__file__, level=10)
 import timeit
 
@@ -73,7 +74,7 @@ if __name__ == "__main__":
             df['query_time'] = datetime.now().strftime('%H:%M:%S')
             df.reset_index(inplace=True)
             df.rename(columns={'index':'code', 'date':'trade_date', 'time':'trade_time', 'close':'yst_close'}, inplace=True)
-            df['is_limit_up'] = df.apply(lambda row: is_limit_up(row['now'], row['yst_close']),axis=1)
+            df['is_limit_up'] = df.apply(lambda row: is_limit_up(row['high'], row['yst_close']),axis=1)
             limit_up_df = df[df.is_limit_up == 1]
             limit_up_codes.update(limit_up_df['code'].tolist())
             df.to_sql(table_name, con=QueryDbServer.engine, index=False, if_exists='append')
