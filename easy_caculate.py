@@ -43,7 +43,7 @@ def caculate_limitup_time(code: str):
     code_df['limit_up'] = round(code_df['yst_close'] * 1.1, 2)
     limit_up_time = ''
     for index, rows in code_df.iterrows():
-        if rows['high'] == rows['limit_up']:
+        if rows['high'] >= rows['limit_up']:
             limit_up_time = rows['trade_time']
             break
     return limit_up_time
