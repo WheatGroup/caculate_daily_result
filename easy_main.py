@@ -16,7 +16,6 @@ from config import *
 from datetime import datetime, date, time
 from irm_logger import Logger
 import pandas as pd
-from multiprocessing import Pool
 logger = Logger(__file__, level=10)
 import timeit
 
