@@ -17,7 +17,7 @@ from tools import save_element, save_become_worse
 
 
 today = date.today().strftime('%Y-%m-%d')
-# today = '2019-05-15'
+today = '2019-05-17'
 table_name = today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
@@ -44,7 +44,7 @@ def caculate_limitup_time(code: str):
     code_df['limit_up'] = round(code_df['yst_close'] * 1.1, 2)
     limit_up_time = ''
     for index, rows in code_df.iterrows():
-        if rows['now'] == rows['limit_up']:
+        if rows['high'] == rows['limit_up']:
             limit_up_time = rows['trade_time']
             break
     return limit_up_time
@@ -84,6 +84,7 @@ def get_num_raiselimit(code: str):
 
 if __name__ == "__main__":
     ### 读取当天所有的涨停过的股票
+    save_element()
     sql = "SELECT DISTINCT(code) from `%s` where is_limit_up = 1;" % (table_name)
     code_df = QueryDbServer.query(sql)
     symbol = code_df['code'].tolist()
