@@ -57,7 +57,7 @@ def get_7(day):
 
 def get_8(day):
     #上一个的全部涨停板（上一个交易日）
-    sql = "select count(*) as num from daily_result_detail where date = '%s';" % day
+    sql = "select count(*) as num from daily_result_detail where date = '%s' and close_is_raiselimit = 1;" % day
     num_df = pd.read_sql(sql, mysql_engine)
     print(num_df['num'][0])
     return num_df['num'][0]
@@ -147,7 +147,6 @@ def get_28(day):
 def get_elements():
     elements_list = []
     today = datetime.now().strftime('%Y-%m-%d')
-    # today = '2019-04-26'
     pre_today = get_pro_trading_day(today)
     element1 = datetime.now().strftime('%m/%d')
     element2 = datetime.now().strftime('%m') + "月" + datetime.now().strftime('%d') + "日"
@@ -324,26 +323,30 @@ def shangzhang_rate(day):
                 #一字开盘
                 rate0 = rate0+1
             elif(rate1_tmp < -0.02):
-                rate1 = rate1+1
+                rate5 = rate5+1
             elif(rate1_tmp < 0):
-                rate2 = rate2+1
+                rate4 = rate4+1
             elif(rate1_tmp < 0.02):
                 rate3 = rate3+1
             elif(rate1_tmp < 0.05):
-                rate4 = rate4+1
+                rate2 = rate2+1
             else:
-                rate5 = rate5+1
+                rate1 = rate1+1
             #收盘价的表现
             rate2_tmp_series = (this_code_today_info['now'] - row['close_price']) / row['close_price']
             rate2_tmp = rate2_tmp_series[0]
             if (0 == this_code_today_info['turnover'][0]):
+                #停盘
                 rate10 = rate10 + 1
             elif (rate2_tmp < 0):
-                rate7 = rate7 + 1
+                #下跌
+                rate9 = rate9 + 1
             elif (rate2_tmp < 0.05):
+                #0~0.05
                 rate8 = rate8 + 1
             else:
-                rate9 = rate9 + 1
+                #>0.05
+                rate7 = rate7 + 1
         except Exception as e:
             traceback.print_exc()
     ###  rate6 计算的是 今日连板的数量 也就是从daily_result_detail中选出大于2的
@@ -405,5 +408,4 @@ if __name__ == '__main__':
     # save_become_worse()
     # code = '603885'
     # dict = get_today_code_info(day, code)
-    day = '2019-04-29'
-    save_element()
+    get_elements()
