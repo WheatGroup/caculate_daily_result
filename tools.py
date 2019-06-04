@@ -147,6 +147,7 @@ def get_28(day):
 def get_elements():
     elements_list = []
     today = datetime.now().strftime('%Y-%m-%d')
+    # today = '2019-06-04'
     pre_today = get_pro_trading_day(today)
     element1 = datetime.now().strftime('%m/%d')
     element2 = datetime.now().strftime('%m') + "月" + datetime.now().strftime('%d') + "日"
@@ -319,7 +320,7 @@ def shangzhang_rate(day):
             rate1_tmp = rate1_tmp_series
             print(i, '===', rate1_tmp, "====", row['code'], "====", this_code_today_info['open'].values[0], "====", row['close_price'])
             # if (this_code_today_info['bid1'][0] == this_code_today_info['now'][0]):
-            if (this_code_today_info['bid1'][0] == this_code_today_info['open'][0]):
+            if (rate1_tmp > 0.099):
                 #一字开盘
                 rate0 = rate0+1
             elif(rate1_tmp < -0.02):

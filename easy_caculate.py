@@ -17,6 +17,7 @@ from tools import save_element, save_become_worse
 
 
 today = date.today().strftime('%Y-%m-%d')
+# today = '2019-06-04'
 table_name = today
 result = ts.trade_cal()
 df = result[(result.calendarDate >= '2018-01-01') & (result.isOpen == 1)]
